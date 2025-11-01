@@ -5,19 +5,24 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.week78lab_soal1.R
-import com.example.week78lab_soal1.ui.model.*
+import com.example.week78lab_soal1.data.container.WeatherContainer
+import com.example.week78lab_soal1.data.dto.*
 
 @Composable
 fun WeatherSuccessView(
@@ -30,8 +35,8 @@ fun WeatherSuccessView(
     val pandaImage = when (weatherCondition.lowercase()) {
         "clear" -> R.drawable.panda_clear
         "clouds" -> R.drawable.panda_cloud
-        else -> R.drawable.panda_rain
-
+        "rain" -> R.drawable.panda_rain
+        else -> R.drawable.panda_clear
     }
 
     Column(
@@ -46,15 +51,19 @@ fun WeatherSuccessView(
         Image(
             painter = painterResource(id = pandaImage),
             contentDescription = "Panda $weatherCondition",
-            modifier = Modifier.size(220.dp)
+            modifier = Modifier.size(220.dp),
+            contentScale = ContentScale.Fit
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         // Weather icon from API
-        val iconUrl = "https://openweathermap.org/img/wn/${weather.weather.first().icon}@4x.png"
+        val iconUrl = WeatherContainer.getWeatherIconUrl(weather.weather.first().icon)
         AsyncImage(
-            model = iconUrl,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(iconUrl)
+                .crossfade(true)
+                .build(),
             contentDescription = "Weather icon",
             modifier = Modifier.size(120.dp)
         )
@@ -89,6 +98,16 @@ fun WeatherSuccessView(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Sunrise & Sunset Card
+        SunTimesCard(
+            sunriseTimestamp = weather.sys.sunrise,
+            sunsetTimestamp = weather.sys.sunset,
+            timezoneOffset = weather.timezone,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Weather details card
         Card(
             modifier = Modifier
@@ -110,6 +129,10 @@ fun WeatherSuccessView(
                     color = Color(0xFF1976D2),
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
+
+                HorizontalDivider(color = Color.LightGray)
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 WeatherDetailRow("Feels Like", "${weather.main.feelsLike.toInt()}°C")
                 WeatherDetailRow("Min / Max", "${weather.main.tempMin.toInt()}°C / ${weather.main.tempMax.toInt()}°C")
@@ -153,7 +176,6 @@ fun WeatherDetailRow(
     }
 }
 
-// Preview with dummy data
 @Preview(showBackground = true)
 @Composable
 private fun WeatherSuccessViewPreview() {
@@ -184,8 +206,8 @@ private fun WeatherSuccessViewPreview() {
             type = 1,
             id = 9374,
             country = "ID",
-            sunrise = 1234567890,
-            sunset = 1234567890
+            sunrise = 1640829720,
+            sunset = 1640862540
         ),
         timezone = 25200,
         id = 1625822,

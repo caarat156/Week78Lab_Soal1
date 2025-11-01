@@ -4,8 +4,7 @@ import com.example.week78lab_soal1.data.dto.WeatherResponse
 
 sealed class WeatherUiState {
     object Initial : WeatherUiState()
-    object Loading : WeatherUiState()
-        data class Success(val weather: WeatherResponse) : WeatherUiState()
+    data class Success(val weather: WeatherResponse) : WeatherUiState()
     data class Error(val message: String) : WeatherUiState()
 }
 

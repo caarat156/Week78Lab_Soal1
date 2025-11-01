@@ -34,15 +34,6 @@ fun WeatherErrorView(
     ) {
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Error panda
-        Image(
-            painter = painterResource(id = R.drawable.panda_error),
-            contentDescription = "Error Panda",
-            modifier = Modifier.size(220.dp)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
         // Error icon
         Icon(
             imageVector = Icons.Default.Error,
